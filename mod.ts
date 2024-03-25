@@ -114,3 +114,26 @@ export const details = (data: Record<string, unknown>) => {
 
   span.data.push(...Object.entries(data))
 }
+
+const spanHandle = {
+  [Symbol.dispose]() {
+    exit()
+  }
+}
+
+/**
+ * Enters a new tracing span like {@link enter} but returns a handle that will automatically
+ * call {@link exit} upon dispose. This means you can use explicit resource management.
+ *
+ * @example
+ * ```
+ * const myFunc = (a: number, b: number) => {
+ *   using _span = tracing.span("my function", { a, b })
+ *   return a + b
+ * }
+ * ```
+ */
+export const span = (name: string, data: Record<string, unknown> = {}): typeof spanHandle => {
+  enter(name, data)
+  return spanHandle
+}

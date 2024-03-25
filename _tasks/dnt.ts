@@ -7,7 +7,8 @@ await dnt.build({
   entryPoints: ["./mod.ts"],
   outDir: "./npm",
   shims: {
-    crypto: true
+    crypto: true,
+    deno: "dev"
   },
   typeCheck: false,
   package: {
