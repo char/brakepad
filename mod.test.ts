@@ -1,34 +1,11 @@
 import * as tracing from "./mod.ts"
+import { ConsoleTracer } from "./console-tracer.ts"
 
 // TODO: actually have a mock tracer and assert some things
 
-const fullSpanName = (span: tracing.TraceSpan) => {
-  let name = span.name
-
-  let curr = span.parent
-  while (curr !== undefined) {
-    name = name = curr.name + "." + name
-    curr = curr.parent
-  }
-
-  return name
-}
-
 tracing.init({
   currentSpan: undefined,
-  tracer: {
-    start(span) {
-      console.log("start", fullSpanName(span), span.data)
-    },
-    finish(span) {
-      console.log(
-        "finish",
-        fullSpanName(span),
-        span.end ? span.end - span.start : "unknown",
-        span.data
-      )
-    }
-  }
+  tracer: new ConsoleTracer()
 })
 
 Deno.test("250ms wait", async () => {
