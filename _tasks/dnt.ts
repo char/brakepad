@@ -7,12 +7,6 @@ await dnt.build({
   entryPoints: ["./mod.ts"],
   outDir: "./npm",
   shims: {
-    custom: [
-      {
-        module: "node:crypto",
-        globalNames: [{ name: "crypto", exportName: "default" }]
-      }
-    ],
     deno: "dev"
   },
   typeCheck: false,
