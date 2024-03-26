@@ -5,7 +5,8 @@ import { ConsoleTracer } from "./console-tracer.ts"
 
 tracing.init({
   currentSpan: undefined,
-  tracer: new ConsoleTracer()
+  tracer: new ConsoleTracer(),
+  currentNameStack: []
 })
 
 Deno.test("250ms wait", async () => {

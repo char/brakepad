@@ -1,5 +1,3 @@
-import { generate as generateUUIDv1 } from "https://deno.land/std@0.220.1/uuid/v1.ts"
-
 declare global {
   // deno-lint-ignore no-var
   var __BRAKEPAD__: TracingContext | undefined
@@ -9,6 +7,7 @@ export interface TraceSpan {
   id: string
   parent: TraceSpan | undefined
   name: string
+  fullName: string
   data: [string, unknown][]
   start: ReturnType<typeof performance.now>
   end: ReturnType<typeof performance.now> | undefined
@@ -24,6 +23,7 @@ export interface Tracer {
 export interface TracingContext {
   tracer: Tracer
   currentSpan: TraceSpan | undefined
+  currentNameStack: string[]
 }
 
 let ctx: TracingContext = globalThis.__BRAKEPAD__ ?? {
@@ -31,7 +31,8 @@ let ctx: TracingContext = globalThis.__BRAKEPAD__ ?? {
     start(_span) {},
     finish(_span) {}
   },
-  currentSpan: undefined
+  currentSpan: undefined,
+  currentNameStack: []
 }
 
 /**
@@ -53,14 +54,16 @@ export const init = (context: TracingContext) => {
  */
 export const enter = (span: string, data: Record<string, unknown> = {}) => {
   const traceSpan: TraceSpan = {
-    id: generateUUIDv1() as string,
+    id: crypto.randomUUID(),
     parent: ctx.currentSpan,
     name: span,
+    fullName: [...ctx.currentNameStack, span].join("."),
     data: Object.entries(data),
     start: performance.now(),
     end: undefined
   }
   ctx.currentSpan = traceSpan
+  ctx.currentNameStack.push(span)
   ctx.tracer.start(traceSpan)
 }
 
@@ -73,6 +76,7 @@ export const exit = () => {
 
   span.end = performance.now()
   ctx.currentSpan = span.parent
+  ctx.currentNameStack.pop()
   ctx.tracer.finish(span)
 }
 
@@ -88,18 +92,21 @@ export const replace = (span: string, data: Record<string, unknown> = {}) => {
   if (oldSpan) {
     oldSpan.end = performance.now()
     ctx.currentSpan = oldSpan.parent
+    ctx.currentNameStack.pop()
     ctx.tracer.finish(oldSpan)
   }
 
   const traceSpan: TraceSpan = {
-    id: generateUUIDv1() as string,
+    id: crypto.randomUUID(),
     parent: ctx.currentSpan,
     name: span,
+    fullName: [...ctx.currentNameStack, span].join("."),
     data: Object.entries(data),
     start: performance.now(),
     end: undefined
   }
   ctx.currentSpan = traceSpan
+  ctx.currentNameStack.push(span)
   ctx.tracer.start(traceSpan)
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@char-lt/brakepad",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "tasks": {
     "dnt": "deno run -A ./_tasks/dnt.ts"
   }

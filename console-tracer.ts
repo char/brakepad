@@ -4,19 +4,12 @@ export class ConsoleTracer implements Tracer {
   constructor() {}
 
   start(span: TraceSpan) {
-    let fullName = span.name
-    let curr = span.parent
-    while (curr !== undefined) {
-      fullName = curr.name + "." + fullName
-      curr = curr.parent
-    }
-
     const output = [
       "%c%s %c%s",
       "color: dimgray",
       new Date(performance.timeOrigin + span.start).toISOString(),
       "color: white; font-weight: bold; text-decoration: underline",
-      fullName
+      span.fullName
     ]
 
     if (span.data.length > 0) {
