@@ -10,8 +10,8 @@ export interface TraceSpan {
   parent: TraceSpan | undefined
   name: string
   data: [string, unknown][]
-  start: number
-  end: number | undefined
+  start: ReturnType<typeof performance.now>
+  end: ReturnType<typeof performance.now> | undefined
 }
 
 export interface Tracer {
